@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-Announcement Guru Bertugas</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#075985',
+              800: '#0c4a6e',
+              900: '#082f49',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Styling scrollbar halus */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    /* Print styling khas untuk penyampaian perhimpunan / rekod guru bertugas */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #print-area, #print-area * {
+        visibility: visible;
+      }
+      #print-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        display: block !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+  <header class="bg-gradient-to-r from-sky-900 via-sky-800 to-indigo-900 text-white shadow-lg sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between py-4 gap-3">
+        <!-- Logo & Tajuk -->
+        <div class="flex items-center space-x-3">
+          <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center border border-white/20 shadow-inner">
+            <i class="fa-solid fa-bullhorn text-2xl text-amber-300"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-xl md:text-2xl font-extrabold tracking-tight">E-ANNOUNCEMENT GURU BERTUGAS</h1>
+              <span class="bg-emerald-500/20 text-emerald-300 text-xs px-2.5 py-0.5 rounded-full border border-emerald-400/30 font-medium">Sesi 2026/2027</span>
+            </div>
+            <p class="text-xs md:text-sm text-sky-200 tracking-wide font-light">“Satu Pusat Maklumat, Mudah Dibaca, Mudah Disampaikan”</p>
+          </div>
+        </div>
+
+        <!-- Butang Tindakan Header Pantas -->
+        <div class="flex items-center gap-2 flex-wrap">
+          <button onclick="openModalTambah()" class="flex items-center gap-2 bg-amber-400 hover:bg-amber-300 text-slate-900 font-semibold px-4 py-2 rounded-xl text-sm shadow-md hover:shadow-lg transition-all transform active:scale-95">
+            <i class="fa-solid fa-plus-circle"></i>
+            <span>Tambah Maklumat</span>
+          </button>
+          <button onclick="cetakLaporanMingguan()" class="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 font-medium px-3.5 py-2 rounded-xl text-sm transition-all">
+            <i class="fa-solid fa-print"></i>
+            <span class="hidden sm:inline">Cetak Taklimat</span>
+          </button>
+        </div>
+      </div>
+
+      <nav class="flex space-x-1 overflow-x-auto pb-2 pt-1 border-t border-white/10 text-sm no-scrollbar">
+        <button onclick="tukarTab('info-hari-ini')" id="tab-info-hari-ini" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors bg-white/20 text-white shadow-sm flex items-center gap-2">
+          <i class="fa-regular fa-calendar-check"></i> Info Hari Ini
+        </button>
+        <button onclick="tukarTab('guru-bertugas')" id="tab-guru-bertugas" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors text-sky-200 hover:bg-white/10 hover:text-white flex items-center gap-2">
+          <i class="fa-solid fa-user-shield"></i> Guru Bertugas Minggu Ini
+        </button>
+        <button onclick="tukarTab('pengumuman-mingguan')" id="tab-pengumuman-mingguan" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors text-sky-200 hover:bg-white/10 hover:text-white flex items-center gap-2">
+          <i class="fa-solid fa-newspaper"></i> Pengumuman Mingguan
+        </button>
+        <button onclick="tukarTab('jadual-bertugas')" id="tab-jadual-bertugas" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors text-sky-200 hover:bg-white/10 hover:text-white flex items-center gap-2">
+          <i class="fa-solid fa-calendar-days"></i> Jadual Guru Bertugas
+        </button>
+        <button onclick="tukarTab('program-sekolah')" id="tab-program-sekolah" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors text-sky-200 hover:bg-white/10 hover:text-white flex items-center gap-2">
+          <i class="fa-solid fa-flag"></i> Program Sekolah
+        </button>
+        <button onclick="tukarTab('tindakan-segera')" id="tab-tindakan-segera" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors text-sky-200 hover:bg-white/10 hover:text-white flex items-center gap-2">
+          <i class="fa-solid fa-triangle-exclamation text-amber-300"></i> Tindakan Segera
+        </button>
+        <button onclick="tukarTab('arkib-pengumuman')" id="tab-arkib-pengumuman" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors text-sky-200 hover:bg-white/10 hover:text-white flex items-center gap-2">
+          <i class="fa-solid fa-box-archive"></i> Arkib Pengumuman
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-grow">
+    
+    <!-- Ribbon Pemilihan Minggu Pantas -->
+    <div class="bg-white rounded-2xl p-4 mb-6 shadow-sm border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center font-bold">
+          <i class="fa-solid fa-sliders"></i>
+        </div>
+        <div>
+          <label for="pilihMingguUtama" class="text-xs uppercase tracking-wider font-semibold text-slate-500">Pilih Minggu Bertugas</label>
+          <div class="flex items-center gap-2 mt-0.5">
+            <select id="pilihMingguUtama" onchange="tukarMingguSemasa(this.value)" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm font-semibold rounded-lg focus:ring-sky-500 focus:border-sky-500 block p-2 pr-8 shadow-sm">
+              <!-- Opsyen dijana secara automatik melalui JavaScript (M39 hingga M47) -->
+            </select>
+            <span id="badgeMingguStatus" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
+              Minggu Aktif Semasa
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tarikh Semasa & Maklumat Sistem -->
+      <div class="flex items-center gap-3 text-right">
+        <div class="hidden sm:block">
+          <p id="jamSemasa" class="text-base font-bold text-slate-800 tracking-tight"></p>
+          <p id="tarikhSemasa" class="text-xs text-slate-500 font-medium"></p>
+        </div>
+        <button onclick="resetDataUjian()" title="Set Semula Data Contoh" class="p-2 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-slate-100 transition-colors">
+          <i class="fa-solid fa-arrows-rotate"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl flex-shrink-0">
+          <i class="fa-solid fa-layer-group"></i>
+        </div>
+        <div>
+          <p class="text-xs text-slate-500 font-medium">Jumlah Pengumuman</p>
+          <h3 id="statJumlah" class="text-2xl font-bold text-slate-800">0</h3>
+        </div>
+      </div>
+
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl flex-shrink-0">
+          <i class="fa-solid fa-sparkles"></i>
+        </div>
+        <div>
+          <p class="text-xs text-slate-500 font-medium">Pengumuman Baharu</p>
+          <h3 id="statBaharu" class="text-2xl font-bold text-emerald-600">0</h3>
+        </div>
+      </div>
+
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl flex-shrink-0">
+          <i class="fa-regular fa-envelope-open"></i>
+        </div>
+        <div>
+          <p class="text-xs text-slate-500 font-medium">Belum Dibaca</p>
+          <h3 id="statBelumBaca" class="text-2xl font-bold text-amber-600">0</h3>
+        </div>
+      </div>
+
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-xl flex-shrink-0">
+          <i class="fa-solid fa-circle-exclamation"></i>
+        </div>
+        <div>
+          <p class="text-xs text-slate-500 font-medium">Tindakan Belum Selesai</p>
+          <h3 id="statTindakan" class="text-2xl font-bold text-rose-600">0</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- KAD UTAMA GURU BERTUGAS MINGGU INI (DIJADIKAN LEBIH BESAR DAN MENYERLAH) -->
+    <div id="kadGuruBertugasUtama" class="mb-8 bg-gradient-to-br from-white via-sky-50/40 to-blue-50/60 rounded-3xl p-6 sm:p-8 shadow-md border-2 border-sky-300 relative overflow-hidden transition-all duration-300 hover:shadow-xl">
+      <!-- Watermark latar belakang hiasan -->
+      <div class="absolute -right-6 -bottom-8 text-sky-200/40 text-9xl pointer-events-none select-none font-black opacity-30">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+
+      <div class="relative z-10">
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-sky-200/60">
+          <div class="flex items-center gap-3">
+            <span class="px-3.5 py-1.5 rounded-xl bg-sky-600 text-white font-bold text-sm tracking-wide shadow-sm flex items-center gap-2">
+              <i class="fa-solid fa-star text-amber-300"></i> FOKUS UTAMA
+            </span>
+            <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+              GURU BERTUGAS MINGGU INI
+            </h2>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="labelMingguHero" class="bg-indigo-600 text-white font-black text-sm sm:text-base px-4 py-1.5 rounded-xl shadow-sm">
+              MINGGU 39
+            </span>
+            <span id="labelKodHero" class="bg-slate-800 text-amber-300 font-mono font-bold text-sm sm:text-base px-3 py-1.5 rounded-xl border border-slate-700 shadow-sm">
+              KOD: SSS / AKK
+            </span>
+          </div>
+        </div>
+
+        <!-- Senarai Guru Bertugas Bergaya Kad Profil -->
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4" id="senaraiGuruHero">
+          <!-- Diisi dynamically melalui Javascript -->
+        </div>
+
+        <!-- Panduan Ringkas Penyampaian untuk Guru Bertugas -->
+        <div class="mt-6 p-3.5 bg-sky-100/70 border border-sky-200 rounded-xl flex items-center justify-between flex-wrap gap-2 text-xs sm:text-sm text-sky-900">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-circle-info text-sky-600 text-base"></i>
+            <span><strong>Peringatan Guru Bertugas:</strong> Sila pastikan semua maklumat bertanda <span class="text-rose-600 font-bold">Sangat Penting</span> dibacakan semasa taklimat/perhimpunan mingguan.</span>
+          </div>
+          <button onclick="tandakanSemuaMingguIniDibaca()" class="text-xs bg-sky-700 hover:bg-sky-800 text-white px-3 py-1.5 rounded-lg transition-colors font-semibold">
+            Tandakan Semua Telah Dibaca
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl p-4 sm:p-5 mb-6 shadow-sm border border-slate-200">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <!-- Input Carian -->
+        <div class="relative lg:col-span-2">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
+          <input type="text" id="filterCarian" oninput="aplikasiPenapis()" placeholder="Cari tajuk, guru, atau perkataan..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all">
+        </div>
+
+        <!-- Penapis Kategori -->
+        <div>
+          <select id="filterKategori" onchange="aplikasiPenapis()" class="w-full py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+            <option value="">Semua Kategori</option>
+            <option value="Pentadbiran">Pentadbiran</option>
+            <option value="Akademik">Akademik</option>
+            <option value="HEM">HEM</option>
+            <option value="Kokurikulum">Kokurikulum</option>
+            <option value="Program Sekolah">Program Sekolah</option>
+            <option value="Disiplin">Disiplin</option>
+            <option value="Keselamatan">Keselamatan</option>
+            <option value="Kehadiran">Kehadiran</option>
+            <option value="Pengumuman Umum">Pengumuman Umum</option>
+            <option value="Lain-lain">Lain-lain</option>
+          </select>
+        </div>
+
+        <!-- Penapis Tahap Kepentingan -->
+        <div>
+          <select id="filterKepentingan" onchange="aplikasiPenapis()" class="w-full py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+            <option value="">Semua Kepentingan</option>
+            <option value="Sangat Penting">Sangat Penting (Merah)</option>
+            <option value="Perlu Perhatian">Perlu Perhatian (Kuning)</option>
+            <option value="Makluman Biasa">Makluman Biasa (Hijau)</option>
+            <option value="Program Aktiviti">Program / Aktiviti (Biru)</option>
+          </select>
+        </div>
+
+        <!-- Butang Reset Tapisan -->
+        <div>
+          <button onclick="resetTapisan()" class="w-full py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2">
+            <i class="fa-solid fa-filter-circle-xmark"></i>
+            <span>Set Semula</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- KAWASAN KANDUNGAN UTAMA MENGIKUT TAB -->
+    <div id="tabContentContainer">
+      <!-- Pengumuman & Maklumat Mingguan -->
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 id="tajukBahagian" class="text-xl font-bold text-slate-800">Senarai Pengumuman</h2>
+          <p id="subtajukBahagian" class="text-xs text-slate-500">Memaparkan maklumat bagi Minggu 39</p>
+        </div>
+        <span id="kiraanHasil" class="text-xs font-semibold bg-slate-200 text-slate-700 px-3 py-1 rounded-full">0 Maklumat Dijumpai</span>
+      </div>
+
+      <!-- Grid Pengumuman -->
+      <div id="gridPengumuman" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Kad-kad pengumuman akan dimuatkan oleh JavaScript -->
+      </div>
+
+      <!-- Paparan Kosong Jika Tiada Data -->
+      <div id="paparanKosong" class="hidden text-center py-16 bg-white rounded-3xl border border-dashed border-slate-300 p-6">
+        <div class="w-16 h-16 mx-auto mb-4 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center text-2xl">
+          <i class="fa-solid fa-clipboard-question"></i>
+        </div>
+        <h3 class="text-base font-bold text-slate-700">Tiada Pengumuman Dijumpai</h3>
+        <p class="text-sm text-slate-400 mt-1 max-w-sm mx-auto">Tiada sebarang pengumuman padan dengan minggu atau penapis yang dipilih. Sila klik butang di bawah untuk menambah maklumat baharu.</p>
+        <button onclick="openModalTambah()" class="mt-4 bg-sky-600 hover:bg-sky-700 text-white font-medium px-4 py-2 rounded-xl text-sm inline-flex items-center gap-2">
+          <i class="fa-solid fa-plus"></i> Tambah Pengumuman Baharu
+        </button>
+      </div>
+    </div>
+
+    <!-- TAB JADUAL GURU BERTUGAS MINGGUAN (M39 HINGGA M47) -->
+    <div id="bahagianJadualPenuh" class="hidden mt-4">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-5 border-b border-slate-200 bg-slate-50/50 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 class="text-lg font-bold text-slate-800">Jadual Guru Bertugas Mingguan</h3>
+            <p class="text-xs text-slate-500">Susunan giliran rasmi guru bertugas dari Minggu 39 hingga Minggu 47</p>
+          </div>
+          <span class="text-xs font-semibold px-3 py-1 bg-sky-100 text-sky-800 rounded-full">9 Minggu Direkodkan</span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr class="bg-slate-100 text-slate-600 uppercase text-xs tracking-wider border-b border-slate-200">
+                <th class="py-3.5 px-4 font-semibold">Minggu</th>
+                <th class="py-3.5 px-4 font-semibold">Kod Guru</th>
+                <th class="py-3.5 px-4 font-semibold">Nama Guru Bertugas</th>
+                <th class="py-3.5 px-4 font-semibold text-center">Status</th>
+                <th class="py-3.5 px-4 font-semibold text-right">Tindakan</th>
+              </tr>
+            </thead>
+            <tbody id="badanJadualGuru" class="divide-y divide-slate-100">
+              <!-- Dijana secara dinamik melalui JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4">
+      <p class="font-medium text-slate-700">E-ANNOUNCEMENT GURU BERTUGAS &copy; 2026</p>
+      <p class="mt-1">Dibangunkan khusus untuk memudahkan pengurusan maklumat & taklimat guru bertugas sekolah.</p>
+    </div>
+  </footer>
+
+  <!-- MODAL BORANG TAMBAH / KEMASKINI PENGUMUMAN -->
+  <div id="modalBorang" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm overflow-y-auto flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all">
+      <!-- Modal Header -->
+      <div class="bg-gradient-to-r from-sky-800 to-indigo-900 p-5 text-white flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-amber-300">
+            <i class="fa-solid fa-pen-to-square text-lg"></i>
+          </div>
+          <div>
+            <h3 id="tajukModalBorang" class="font-bold text-lg">Tambah Maklumat / Pengumuman</h3>
+            <p class="text-xs text-sky-200">Sila lengkapkan butiran untuk disampaikan kepada guru bertugas.</p>
+          </div>
+        </div>
+        <button onclick="tutupModalBorang()" class="text-white/80 hover:text-white text-xl p-1">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body (Borang) -->
+      <form id="borangPengumuman" onsubmit="simpanPengumuman(event)" class="p-6 space-y-4">
+        <input type="hidden" id="formId">
+
+        <!-- Tajuk Pengumuman -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Tajuk Pengumuman <span class="text-rose-500">*</span></label>
+          <input type="text" id="formTajuk" required placeholder="Contoh: Taklimat Ujian Akhir Sesi Akademik" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 focus:bg-white outline-none">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Nama Guru Pengirim -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Nama Guru Penghantar <span class="text-rose-500">*</span></label>
+            <input type="text" id="formGuru" required placeholder="Contoh: Cikgu Ahmad Razali" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 focus:bg-white outline-none">
+          </div>
+
+          <!-- Tarikh -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Tarikh <span class="text-rose-500">*</span></label>
+            <input type="date" id="formTarikh" required class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 focus:bg-white outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <!-- Minggu Pengumuman -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Minggu <span class="text-rose-500">*</span></label>
+            <select id="formMinggu" required class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 focus:bg-white outline-none">
+              <!-- Dijana JS -->
+            </select>
+          </div>
+
+          <!-- Kategori -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Kategori <span class="text-rose-500">*</span></label>
+            <select id="formKategori" required class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 focus:bg-white outline-none">
+              <option value="Pentadbiran">Pentadbiran</option>
+              <option value="Akademik">Akademik</option>
+              <option value="HEM">HEM</option>
+              <option value="Kokurikulum">Kokurikulum</option>
+              <option value="Program Sekolah">Program Sekolah</option>
+              <option value="Disiplin">Disiplin</option>
+              <option value="Keselamatan">Keselamatan</option>
+              <option value="Kehadiran">Kehadiran</option>
+              <option value="Pengumuman Umum">Pengumuman Umum</option>
+              <option value="Lain-lain">Lain-lain</option>
+            </select>
+          </div>
+
+          <!-- Tahap Kepentingan -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Tahap Kepentingan <span class="text-rose-500">*</span></label>
+            <select id="formKepentingan" required class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 focus:bg-white outline-none">
+              <option value="Sangat Penting">🔴 Sangat Penting (Merah)</option>
+              <option value="Perlu Perhatian">🟡 Perlu Perhatian (Kuning)</option>
+              <option value="Makluman Biasa">🟢 Makluman Biasa (Hijau)</option>
+              <option value="Program Aktiviti">🔵 Program / Aktiviti (Biru)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Kandungan Pengumuman -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Kandungan Pengumuman <span class="text-rose-500">*</span></label>
+          <textarea id="formKandungan" rows="4" required placeholder="Tuliskan secara jelas perkara yang ingin disampaikan kepada guru-guru dan murid..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 focus:bg-white outline-none"></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Tindakan Diperlukan -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Tindakan Diperlukan</label>
+            <input type="text" id="formTindakan" placeholder="Contoh: Guru Kelas kumpul borang kebenaran" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 focus:bg-white outline-none">
+          </div>
+
+          <!-- Tarikh Akhir Tindakan -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Tarikh Akhir Tindakan</label>
+            <input type="date" id="formTarikhAkhir" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 focus:bg-white outline-none">
+          </div>
+        </div>
+
+        <!-- Butang Simpan / Batal -->
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
+          <button type="button" onclick="tutupModalBorang()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold transition-colors">
+            Batal
+          </button>
+          <button type="submit" class="px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-2">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span>Simpan Maklumat</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL LIHAT BUTIRAN PENGUMUMAN -->
+  <div id="modalLihat" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm overflow-y-auto flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-xl w-full shadow-2xl border border-slate-200 overflow-hidden">
+      <div id="modalLihatHeader" class="p-6 text-white bg-slate-800">
+        <div class="flex items-center justify-between mb-2">
+          <span id="lihatBadgeKategori" class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg bg-white/20"></span>
+          <span id="lihatBadgeKepentingan" class="text-xs font-bold px-3 py-1 rounded-full"></span>
+        </div>
+        <h3 id="lihatTajuk" class="text-xl font-extrabold leading-snug"></h3>
+        <p id="lihatSubinfo" class="text-xs text-slate-200 mt-2 flex items-center gap-4"></p>
+      </div>
+
+      <div class="p-6 space-y-4">
+        <div>
+          <h4 class="text-xs uppercase font-bold text-slate-400 mb-1">Kandungan Pengumuman</h4>
+          <p id="lihatKandungan" class="text-sm text-slate-700 leading-relaxed whitespace-pre-line bg-slate-50 p-4 rounded-2xl border border-slate-100"></p>
+        </div>
+
+        <div id="lihatTindakanBox" class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900">
+          <h4 class="text-xs font-bold uppercase text-amber-700 flex items-center gap-1.5 mb-1">
+            <i class="fa-solid fa-triangle-exclamation"></i> Tindakan Diperlukan
+          </h4>
+          <p id="lihatTindakanTeks" class="text-sm font-semibold"></p>
+          <p id="lihatTarikhAkhirTeks" class="text-xs text-amber-700 mt-1 font-medium"></p>
+        </div>
+
+        <div class="flex items-center justify-between pt-4 border-t border-slate-100 text-xs text-slate-500">
+          <span id="lihatStatusBacaan"></span>
+          <div class="flex items-center gap-2">
+            <button onclick="cetakItemTunggal()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 font-medium">
+              <i class="fa-solid fa-print mr-1"></i> Cetak Ini
+            </button>
+            <button onclick="tutupModalLihat()" class="px-4 py-1.5 bg-sky-600 hover:bg-sky-700 rounded-lg text-white font-medium">
+              Tutup
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL PENGESAHAN PADAM (TIADA ALERT/CONFIRM ASLI) -->
+  <div id="modalPadam" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl border border-slate-200">
+      <div class="w-14 h-14 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4">
+        <i class="fa-solid fa-trash-can"></i>
+      </div>
+      <h3 class="text-lg font-bold text-slate-800">Padam Pengumuman?</h3>
+      <p class="text-xs text-slate-500 mt-1">Adakah anda pasti mahu memadamkan rekod ini? Tindakan ini tidak boleh dikembalikan.</p>
+      <div class="flex items-center gap-3 mt-6">
+        <button onclick="tutupModalPadam()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold">Batal</button>
+        <button id="btnSahkanPadam" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-sm font-bold shadow-md">Ya, Padam</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST PEMBERITAHUAN -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-24 opacity-0 transition-all duration-300 flex items-center gap-3 bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl text-sm">
+    <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+    <span id="toastMesej">Berjaya!</span>
+  </div>
+
+  <!-- FORMAT CETAKAN BERSIH UNTUK GURU BERTUGAS MINGGU INI -->
+  <div id="print-area" class="hidden p-8 bg-white text-black font-sans">
+    <div class="text-center border-b-2 border-black pb-4 mb-4">
+      <h1 class="text-xl font-black uppercase tracking-wider">E-ANNOUNCEMENT GURU BERTUGAS</h1>
+      <h2 class="text-sm font-semibold text-gray-700">RINGKASAN TAKLIMAT & PENGUMUMAN MINGGUAN GURU BERTUGAS</h2>
+      <p class="text-xs text-gray-500 mt-1" id="printTarikhJana"></p>
+    </div>
+
+    <!-- Info Guru Bertugas Cetakan -->
+    <div class="mb-6 p-4 border border-black rounded-lg bg-gray-50">
+      <div class="flex justify-between items-center mb-2">
+        <span class="font-bold text-base" id="printMinggu"></span>
+        <span class="font-mono font-bold text-sm" id="printKod"></span>
+      </div>
+      <p class="text-xs font-semibold text-gray-600 uppercase">Senarai Guru Bertugas:</p>
+      <div id="printSenaraiGuru" class="text-sm font-bold mt-1"></div>
+    </div>
+
+    <!-- Senarai Pengumuman Cetakan -->
+    <h3 class="font-bold text-sm uppercase tracking-wide border-b border-gray-400 pb-1 mb-3">Isi Pengumuman & Tindakan Penting</h3>
+    <div id="printIsiPengumuman" class="space-y-4 text-xs"></div>
+
+    <div class="mt-8 pt-4 border-t border-gray-300 grid grid-cols-2 text-center text-xs">
+      <div>
+        <p class="mb-12 font-medium">Disediakan Oleh:</p>
+        <p class="border-t border-gray-400 inline-block px-8 pt-1 font-bold">Guru Bertugas Mingguan</p>
+      </div>
+      <div>
+        <p class="mb-12 font-medium">Disemak Oleh:</p>
+        <p class="border-t border-gray-400 inline-block px-8 pt-1 font-bold">Pentadbir / GPK Pentadbiran</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* -------------------------------------------------------------
+       DATASET JADUAL GURU BERTUGAS MINGGU 39 HINGGA MINGGU 47
+       (Dipelihara tepat seperti yang diberikan pengguna)
+       ------------------------------------------------------------- */
+    const JADUAL_GURU = [
+      {
+        minggu: 39,
+        kod: "SSS / AKK",
+        guru: [
+          { nama: "Shasheila Sheril Binti Sarikol", peranan: "Guru Bertugas 1", avatar: "SS" },
+          { nama: "Akhyari Bin Khalid", peranan: "Guru Bertugas 2", avatar: "AK" }
+        ]
+      },
+      {
+        minggu: 40,
+        kod: "AAF / FSS",
+        guru: [
+          { nama: "Amir Afiq Bin Muhamad Iqbal Firdausi", peranan: "Guru Bertugas 1", avatar: "AA" },
+          { nama: "Fathin Syazwani Binti Syamsul", peranan: "Guru Bertugas 2", avatar: "FS" }
+        ]
+      },
+      {
+        minggu: 41,
+        kod: "AAG / ARA",
+        guru: [
+          { nama: "Amirah Binti Abdul Gani", peranan: "Guru Bertugas 1", avatar: "AG" },
+          { nama: "Artikah Binti Ani", peranan: "Guru Bertugas 2", avatar: "AR" }
+        ]
+      },
+      {
+        minggu: 42,
+        kod: "AMS / CHM",
+        guru: [
+          { nama: "Asrianti Bin M Sani", peranan: "Guru Bertugas 1", avatar: "AM" },
+          { nama: "Charles Mahat", peranan: "Guru Bertugas 2", avatar: "CM" }
+        ]
+      },
+      {
+        minggu: 43,
+        kod: "FRJ / KAT",
+        guru: [
+          { nama: "Fredley Bin Jaun", peranan: "Guru Bertugas 1", avatar: "FJ" },
+          { nama: "Katrine Malim", peranan: "Guru Bertugas 2", avatar: "KM" }
+        ]
+      },
+      {
+        minggu: 44,
+        kod: "MFR / SAI",
+        guru: [
+          { nama: "Mohd Fauzul Bin Abdul Rashid", peranan: "Guru Bertugas 1", avatar: "MF" },
+          { nama: "Sailyri Ena Lamiri", peranan: "Guru Bertugas 2", avatar: "SL" }
+        ]
+      },
+      {
+        minggu: 45,
+        kod: "RAS / SUS",
+        guru: [
+          { nama: "Randy Bin Saimon", peranan: "Guru Bertugas 1", avatar: "RS" },
+          { nama: "Suzinah Binti Sudin", peranan: "Guru Bertugas 2", avatar: "SS" }
+        ]
+      },
+      {
+        minggu: 46,
+        kod: "SCF / RAC",
+        guru: [
+          { nama: "Shawn Christien Fabian", peranan: "Guru Bertugas 1", avatar: "SC" },
+          { nama: "Rachel Debeka C. Madis", peranan: "Guru Bertugas 2", avatar: "RD" }
+        ]
+      },
+      {
+        minggu: 47,
+        kod: "JOF / NFA",
+        guru: [
+          { nama: "John Bin Francis", peranan: "Guru Bertugas 1", avatar: "JF" },
+          { nama: "Nur Fatin Akma Binti Matsin", peranan: "Guru Bertugas 2", avatar: "NF" }
+        ]
+      }
+    ];
+
+    /* Data Permulaan Pengumuman */
+    const PENGUMUMAN_AWAL = [
+      {
+        id: "ann-1",
+        tajuk: "Pemeriksaan Kesihatan & Gigi Murid Tahun 1 & Tahun 6",
+        guru: "Pn. Noraini (Penyelaras Kesihatan)",
+        tarikh: "2026-10-05",
+        minggu: 39,
+        kategori: "HEM",
+        kandungan: "Pasukan pergigian dari Klinik Kesihatan akan hadir sepanjang minggu ini mulai jam 8.30 pagi di Bilik Rawatan. Guru kelas diminta memastikan buku rekod kesihatan murid sedia.",
+        tindakan: "Guru kelas Tahun 1 dan Tahun 6 serahkan borang kebenaran ibu bapa.",
+        tarikhAkhir: "2026-10-06",
+        kepentingan: "Sangat Penting",
+        sudahDibaca: false
+      },
+      {
+        id: "ann-2",
+        tajuk: "Perhimpunan Rasmi Mingguan & Disiplin Pemakaian Lencana",
+        guru: "En. Akhyari Bin Khalid",
+        tarikh: "2026-10-05",
+        minggu: 39,
+        kategori: "Disiplin",
+        kandungan: "Pemeriksaan tatatertib pemakaian tali leher, lencana dan tanda nama murid akan diadakan semasa perhimpunan rasmi. Mohon semua guru kelas bersama memantau barisan kelas masing-masing.",
+        tindakan: "Catat nama murid yang tidak lengkap uniform dalam buku rekod disiplin.",
+        tarikhAkhir: "2026-10-05",
+        kepentingan: "Perlu Perhatian",
+        sudahDibaca: true
+      },
+      {
+        id: "ann-3",
+        tajuk: "Latihan Kawad Kebakaran Peringkat Sekolah Siri 2",
+        guru: "Cik Shasheila Sheril Binti Sarikol",
+        tarikh: "2026-10-07",
+        minggu: 39,
+        kategori: "Keselamatan",
+        kandungan: "Loceng amaran kecemasan akan dibunyikan pada hari Rabu jam 10.00 pagi. Semua murid dan guru mesti mengosongkan bangunan dan berkumpul di padang sekolah dalam tempoh bawah 5 minit.",
+        tindakan: "Semak pelan laluan kecemasan di dalam bilik darjah masing-masing.",
+        tarikhAkhir: "2026-10-07",
+        kepentingan: "Program Aktiviti",
+        sudahDibaca: false
+      },
+      {
+        id: "ann-4",
+        tajuk: "Penghantaran Skor Pentaksiran Bilik Darjah (PBD) Pertengahan Tahun",
+        guru: "Penolong Kanan Pentadbiran",
+        tarikh: "2026-10-08",
+        minggu: 39,
+        kategori: "Akademik",
+        kandungan: "Sistem e-PBD dibuka untuk pengisian tahap penguasaan murid. Sila pastikan eviden pembelajaran telah disimpan rapi untuk sesi moderasi penjaminan kualiti.",
+        tindakan: "Kunci masuk data markah ke dalam modul SPPB KPM.",
+        tarikhAkhir: "2026-10-09",
+        kepentingan: "Sangat Penting",
+        sudahDibaca: false
+      },
+      {
+        id: "ann-5",
+        tajuk: "Mesyuarat Pengurusan Kokurikulum & Karnival Sukan Tahunan",
+        guru: "En. Amir Afiq Bin Muhamad Iqbal",
+        tarikh: "2026-10-12",
+        minggu: 40,
+        kategori: "Kokurikulum",
+        kandungan: "Perbincangan raptai sukan dan penetapan rumah sukan bagi kejohanan olahraga tahunan yang akan berlangsung tidak lama lagi.",
+        tindakan: "Ketua rumah sukan sediakan senarai atlet perbarisan.",
+        tarikhAkhir: "2026-10-14",
+        kepentingan: "Makluman Biasa",
+        sudahDibaca: false
+      }
+    ];
+
+    /* -------------------------------------------------------------
+       STATE APPLICATION
+       ------------------------------------------------------------- */
+    let mingguDipilih = 39; // Permulaan aktif Minggu 39
+    let senaraiPengumuman = [];
+    let tabSemasa = 'info-hari-ini';
+    let idSedangDipadam = null;
+    let itemSedangDilihat = null;
+
+    function initAplikasi() {
+      // Muatkan data dari localStorage atau gunakan contoh asal
+      const dataSimpanan = localStorage.getItem('e_announcement_data_v1');
+      if (dataSimpanan) {
+        try {
+          senaraiPengumuman = JSON.parse(dataSimpanan);
+        } catch (e) {
+          senaraiPengumuman = [...PENGUMUMAN_AWAL];
+        }
+      } else {
+        senaraiPengumuman = [...PENGUMUMAN_AWAL];
+        simpanKeStorage();
+      }
+
+      // Jana dropdown minggu
+      janaPilihanMinggu();
+
+      // Kemaskini masa semasa
+      kemaskiniMasa();
+      setInterval(kemaskiniMasa, 1000);
+
+      // Tetapkan tarikh default hari ini pada form
+      const today = new Date().toISOString().split('T')[0];
+      const formTarikhElem = document.getElementById('formTarikh');
+      if (formTarikhElem) formTarikhElem.value = today;
+
+      // Paparkan paparan awal (Minggu 39 aktif)
+      kemaskiniPaparan();
+    }
+
+    function simpanKeStorage() {
+      localStorage.setItem('e_announcement_data_v1', JSON.stringify(senaraiPengumuman));
+    }
+
+    function resetDataUjian() {
+      if (confirmModalCustom("Adakah anda ingin menetapkan semula ke data contoh asal?")) {
+        senaraiPengumuman = [...PENGUMUMAN_AWAL];
+        simpanKeStorage();
+        kemaskiniPaparan();
+        tunjukToast("Data contoh telah dimuatkan semula!", "success");
+      }
+    }
+
+    function janaPilihanMinggu() {
+      const selectUtama = document.getElementById('pilihMingguUtama');
+      const formMinggu = document.getElementById('formMinggu');
+      
+      selectUtama.innerHTML = '';
+      formMinggu.innerHTML = '';
+
+      JADUAL_GURU.forEach(item => {
+        // Pilihan dropdown utama
+        const opt = document.createElement('option');
+        opt.value = item.minggu;
+        opt.textContent = `Minggu ${item.minggu} (${item.kod})`;
+        if (item.minggu === mingguDipilih) opt.selected = true;
+        selectUtama.appendChild(opt);
+
+        // Pilihan modal borang
+        const optForm = document.createElement('option');
+        optForm.value = item.minggu;
+        optForm.textContent = `Minggu ${item.minggu}`;
+        if (item.minggu === mingguDipilih) optForm.selected = true;
+        formMinggu.appendChild(optForm);
+      });
+    }
+
+    function kemaskiniMasa() {
+      const now = new Date();
+      const hari = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'][now.getDay()];
+      const bulan = ['Januari', 'Februari', 'Mac', 'April', 'Mei', 'Jun', 'Julai', 'Ogos', 'September', 'Oktober', 'November', 'Disember'][now.getMonth()];
+      
+      const jamStr = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const tarikhStr = `${hari}, ${now.getDate()} ${bulan} ${now.getFullYear()}`;
+
+      const jamElem = document.getElementById('jamSemasa');
+      const tarikhElem = document.getElementById('tarikhSemasa');
+      if (jamElem) jamElem.textContent = jamStr;
+      if (tarikhElem) tarikhElem.textContent = tarikhStr;
+    }
+
+    function tukarMingguSemasa(m) {
+      mingguDipilih = parseInt(m, 10);
+      kemaskiniPaparan();
+      tunjukToast(`Paparan bertukar ke Minggu ${mingguDipilih}`);
+    }
+
+    function kemaskiniKadHeroGuru() {
+      const jadual = JADUAL_GURU.find(j => j.minggu === mingguDipilih) || JADUAL_GURU[0];
+      
+      document.getElementById('labelMingguHero').textContent = `MINGGU ${jadual.minggu}`;
+      document.getElementById('labelKodHero').textContent = `KOD: ${jadual.kod}`;
+
+      const badgeStatus = document.getElementById('badgeMingguStatus');
+      if (jadual.minggu === 39) {
+        badgeStatus.textContent = "Minggu Aktif Semasa";
+        badgeStatus.className = "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800";
+      } else {
+        badgeStatus.textContent = `Minggu ${jadual.minggu}`;
+        badgeStatus.className = "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-100 text-sky-800";
+      }
+
+      const container = document.getElementById('senaraiGuruHero');
+      container.innerHTML = jadual.guru.map((g, idx) => `
+        <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center space-x-4 hover:border-sky-400 transition-all">
+          <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-sky-600 to-indigo-600 text-white font-black text-lg sm:text-xl flex items-center justify-center shadow-md flex-shrink-0">
+            ${g.avatar}
+          </div>
+          <div class="overflow-hidden flex-1">
+            <span class="inline-block text-[11px] font-bold uppercase tracking-wider text-sky-700 bg-sky-50 px-2.5 py-0.5 rounded-md mb-1">
+              ${g.peranan}
+            </span>
+            <h4 class="text-base sm:text-lg font-bold text-slate-900 truncate" title="${g.nama}">${g.nama}</h4>
+            <p class="text-xs text-slate-500 flex items-center gap-1.5 mt-0.5">
+              <i class="fa-solid fa-id-badge text-sky-500"></i> Kod: <strong class="text-slate-700">${jadual.kod.split('/')[idx] ? jadual.kod.split('/')[idx].trim() : jadual.kod}</strong>
+            </p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function dapatkanPengumumanDitapis() {
+      const carian = (document.getElementById('filterCarian')?.value || '').toLowerCase().trim();
+      const kat = document.getElementById('filterKategori')?.value || '';
+      const kep = document.getElementById('filterKepentingan')?.value || '';
+
+      return senaraiPengumuman.filter(item => {
+        // Tapis mengikut tab aktif
+        if (tabSemasa === 'pengumuman-mingguan' || tabSemasa === 'info-hari-ini') {
+          if (item.minggu !== mingguDipilih) return false;
+        } else if (tabSemasa === 'program-sekolah') {
+          if (item.kategori !== 'Program Sekolah' && item.kepentingan !== 'Program Aktiviti') return false;
+        } else if (tabSemasa === 'tindakan-segera') {
+          if (!item.tindakan || item.tindakan.trim() === '') return false;
+        } else if (tabSemasa === 'arkib-pengumuman') {
+          // Papar semua rekod merentasi semua minggu
+        }
+
+        // Tapis mengikut borang carian & dropdown
+        if (kat && item.kategori !== kat) return false;
+        if (kep && item.kepentingan !== kep) return false;
+
+        if (carian) {
+          const padanTajuk = item.tajuk.toLowerCase().includes(carian);
+          const padanGuru = item.guru.toLowerCase().includes(carian);
+          const padanKandungan = item.kandungan.toLowerCase().includes(carian);
+          const padanTindakan = (item.tindakan || '').toLowerCase().includes(carian);
+          if (!padanTajuk && !padanGuru && !padanKandungan && !padanTindakan) return false;
+        }
+
+        return true;
+      });
+    }
+
+    function kemaskiniStatistik() {
+      // Jumlah pengumuman untuk minggu semasa
+      const dataMinggu = senaraiPengumuman.filter(a => a.minggu === mingguDipilih);
+      
+      const statJumlah = dataMinggu.length;
+      const statBelumBaca = dataMinggu.filter(a => !a.sudahDibaca).length;
+      const statTindakan = dataMinggu.filter(a => a.tindakan && a.tindakan.trim() !== '').length;
+
+      // Pengumuman baharu (hari ini atau belum dibaca)
+      const statBaharu = dataMinggu.filter(a => !a.sudahDibaca).length;
+
+      document.getElementById('statJumlah').textContent = statJumlah;
+      document.getElementById('statBaharu').textContent = statBaharu;
+      document.getElementById('statBelumBaca').textContent = statBelumBaca;
+      document.getElementById('statTindakan').textContent = statTindakan;
+    }
+
+    function dapatkanWarnaKepentingan(tahap) {
+      switch (tahap) {
+        case 'Sangat Penting':
+          return {
+            border: 'border-l-4 border-l-rose-500',
+            badgeBg: 'bg-rose-100 text-rose-800 border border-rose-300',
+            ikon: 'fa-circle-exclamation text-rose-500',
+            headerBg: 'bg-rose-700'
+          };
+        case 'Perlu Perhatian':
+          return {
+            border: 'border-l-4 border-l-amber-500',
+            badgeBg: 'bg-amber-100 text-amber-900 border border-amber-300',
+            ikon: 'fa-triangle-exclamation text-amber-500',
+            headerBg: 'bg-amber-600'
+          };
+        case 'Makluman Biasa':
+          return {
+            border: 'border-l-4 border-l-emerald-500',
+            badgeBg: 'bg-emerald-100 text-emerald-800 border border-emerald-300',
+            ikon: 'fa-circle-check text-emerald-500',
+            headerBg: 'bg-emerald-700'
+          };
+        case 'Program Aktiviti':
+        default:
+          return {
+            border: 'border-l-4 border-l-sky-500',
+            badgeBg: 'bg-sky-100 text-sky-800 border border-sky-300',
+            ikon: 'fa-calendar-days text-sky-500',
+            headerBg: 'bg-sky-700'
+          };
+      }
+    }
+
+    function kemaskiniPaparan() {
+      kemaskiniKadHeroGuru();
+      kemaskiniStatistik();
+
+      // Kemaskini teks bahagian mengikut tab
+      const tajukElem = document.getElementById('tajukBahagian');
+      const subtajukElem = document.getElementById('subtajukBahagian');
+      
+      if (tabSemasa === 'info-hari-ini') {
+        tajukElem.textContent = `Info & Pengumuman Minggu ${mingguDipilih}`;
+        subtajukElem.textContent = `Ringkasan maklumat teras untuk bacaan guru bertugas minggu ini`;
+      } else if (tabSemasa === 'pengumuman-mingguan') {
+        tajukElem.textContent = `Semua Pengumuman Minggu ${mingguDipilih}`;
+        subtajukElem.textContent = `Senarai lengkap rekod rasmi maklumat sekolah`;
+      } else if (tabSemasa === 'program-sekolah') {
+        tajukElem.textContent = `Program & Aktiviti Sekolah`;
+        subtajukElem.textContent = `Semua aktiviti penting takwim sekolah`;
+      } else if (tabSemasa === 'tindakan-segera') {
+        tajukElem.textContent = `Tindakan Segera Guru`;
+        subtajukElem.textContent = `Senarai maklumat yang memerlukan tindakan susulan`;
+      } else if (tabSemasa === 'arkib-pengumuman') {
+        tajukElem.textContent = `Arkib Semua Pengumuman`;
+        subtajukElem.textContent = `Pangkalan data pengumuman bagi kesemua minggu`;
+      }
+
+      // Dapatkan data selepas tapisan
+      const data = dapatkanPengumumanDitapis();
+      const grid = document.getElementById('gridPengumuman');
+      const kosong = document.getElementById('paparanKosong');
+      const kiraan = document.getElementById('kiraanHasil');
+
+      kiraan.textContent = `${data.length} Maklumat Dijumpai`;
+
+      if (data.length === 0) {
+        grid.innerHTML = '';
+        kosong.classList.remove('hidden');
+        return;
+      }
+
+      kosong.classList.add('hidden');
+      grid.innerHTML = data.map(item => {
+        const gaya = dapatkanWarnaKepentingan(item.kepentingan);
+        return `
+          <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/90 flex flex-col justify-between ${gaya.border} transition-all duration-200 hover:shadow-md">
+            <div>
+              <!-- Baris Atas: Kategori & Kepentingan -->
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <span class="text-xs font-semibold px-2.5 py-0.5 bg-slate-100 text-slate-700 rounded-lg">
+                  <i class="fa-solid fa-tag text-[10px] mr-1 text-slate-400"></i>${item.kategori}
+                </span>
+                <span class="text-[11px] font-bold px-2 py-0.5 rounded-full ${gaya.badgeBg} flex items-center gap-1">
+                  <i class="fa-solid ${gaya.ikon}"></i> ${item.kepentingan}
+                </span>
+              </div>
+
+              <!-- Tajuk -->
+              <h3 class="text-base font-bold text-slate-900 leading-snug line-clamp-2 hover:text-sky-700 transition-colors">
+                ${item.tajuk}
+              </h3>
+
+              <!-- Maklumat Guru & Tarikh -->
+              <div class="flex items-center gap-3 text-xs text-slate-500 mt-2">
+                <span class="flex items-center gap-1"><i class="fa-solid fa-user-pen text-slate-400"></i> ${item.guru}</span>
+                <span>&bull;</span>
+                <span class="flex items-center gap-1"><i class="fa-regular fa-calendar text-slate-400"></i> ${formatTarikh(item.tarikh)}</span>
+              </div>
+
+              <!-- Isi Kandungan Ringkas -->
+              <p class="text-sm text-slate-600 mt-3 line-clamp-3 leading-relaxed">
+                ${item.kandungan}
+              </p>
+
+              <!-- Bahagian Tindakan Segera jika ada -->
+              ${item.tindakan ? `
+                <div class="mt-3.5 p-3 rounded-xl bg-amber-50/80 border border-amber-200/70 text-xs">
+                  <div class="flex items-center gap-1 font-bold text-amber-800">
+                    <i class="fa-solid fa-bell text-amber-600"></i>
+                    <span>Tindakan:</span>
+                  </div>
+                  <p class="text-slate-800 mt-0.5 font-medium line-clamp-2">${item.tindakan}</p>
+                  ${item.tarikhAkhir ? `
+                    <p class="text-[11px] text-amber-700 font-semibold mt-1">Tarikh Akhir: ${formatTarikh(item.tarikhAkhir)}</p>
+                  ` : ''}
+                </div>
+              ` : ''}
+            </div>
+
+            <div class="mt-5 pt-3.5 border-t border-slate-100 flex items-center justify-between gap-1 flex-wrap">
+              <div class="flex items-center gap-1">
+                <!-- Butang Baca/Belum -->
+                <button onclick="togolStatusBaca('${item.id}')" title="${item.sudahDibaca ? 'Tandakan Belum Dibaca' : 'Tandakan Sudah Dibaca'}" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${item.sudahDibaca ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">
+                  <i class="fa-solid ${item.sudahDibaca ? 'fa-circle-check text-emerald-600' : 'fa-circle text-slate-400'}"></i>
+                  <span>${item.sudahDibaca ? 'Telah Dibaca' : 'Belum Dibaca'}</span>
+                </button>
+              </div>
+
+              <div class="flex items-center gap-1">
+                <!-- Butang Lihat -->
+                <button onclick="bukaModalLihat('${item.id}')" title="Lihat Terperinci" class="p-2 text-slate-500 hover:text-sky-600 hover:bg-sky-50 rounded-lg text-xs font-medium transition-colors">
+                  <i class="fa-solid fa-eye text-sm"></i>
+                </button>
+                <!-- Butang Edit -->
+                <button onclick="bukaModalEdit('${item.id}')" title="Edit Pengumuman" class="p-2 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg text-xs font-medium transition-colors">
+                  <i class="fa-solid fa-pen text-sm"></i>
+                </button>
+                <!-- Butang Padam -->
+                <button onclick="bukaModalPadam('${item.id}')" title="Padam Pengumuman" class="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg text-xs font-medium transition-colors">
+                  <i class="fa-solid fa-trash text-sm"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function kemaskiniJadualPenuh() {
+      const tbody = document.getElementById('badanJadualGuru');
+      tbody.innerHTML = JADUAL_GURU.map(item => {
+        const isAktif = item.minggu === mingguDipilih;
+        return `
+          <tr class="hover:bg-slate-50/80 transition-colors ${isAktif ? 'bg-sky-50/60 font-medium' : ''}">
+            <td class="py-3 px-4">
+              <span class="inline-block px-3 py-1 rounded-lg text-xs font-extrabold ${isAktif ? 'bg-sky-600 text-white' : 'bg-slate-200 text-slate-800'}">
+                Minggu ${item.minggu}
+              </span>
+            </td>
+            <td class="py-3 px-4 font-mono font-bold text-sky-800 text-sm">
+              ${item.kod}
+            </td>
+            <td class="py-3 px-4 text-slate-900">
+              <ol class="list-decimal list-inside space-y-1">
+                ${item.guru.map(g => `<li class="text-sm font-semibold">${g.nama}</li>`).join('')}
+              </ol>
+            </td>
+            <td class="py-3 px-4 text-center">
+              ${isAktif ? `
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Sedang Aktif
+                </span>
+              ` : `
+                <span class="text-xs text-slate-400">Dalam Giliran</span>
+              `}
+            </td>
+            <td class="py-3 px-4 text-right">
+              <button onclick="pilihMingguDariJadual(${item.minggu})" class="px-3 py-1.5 rounded-lg text-xs font-bold ${isAktif ? 'bg-sky-700 text-white' : 'bg-slate-100 text-slate-700 hover:bg-sky-600 hover:text-white'} transition-colors">
+                ${isAktif ? 'Dipilih' : 'Pilih Minggu'}
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function pilihMingguDariJadual(m) {
+      document.getElementById('pilihMingguUtama').value = m;
+      tukarMingguSemasa(m);
+      tukarTab('pengumuman-mingguan');
+    }
+
+    function tukarTab(tabId) {
+      tabSemasa = tabId;
+
+      // Kemaskini style tab buttons
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.className = "tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors text-sky-200 hover:bg-white/10 hover:text-white flex items-center gap-2";
+      });
+
+      const btnAktif = document.getElementById(`tab-${tabId}`);
+      if (btnAktif) {
+        btnAktif.className = "tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors bg-white/20 text-white shadow-sm flex items-center gap-2";
+      }
+
+      const containerUtama = document.getElementById('tabContentContainer');
+      const heroCard = document.getElementById('kadGuruBertugasUtama');
+      const bahagianJadual = document.getElementById('bahagianJadualPenuh');
+
+      if (tabId === 'jadual-bertugas') {
+        containerUtama.classList.add('hidden');
+        heroCard.classList.add('hidden');
+        bahagianJadual.classList.remove('hidden');
+        kemaskiniJadualPenuh();
+      } else {
+        containerUtama.classList.remove('hidden');
+        bahagianJadual.classList.add('hidden');
+        heroCard.classList.remove('hidden');
+        kemaskiniPaparan();
+      }
+    }
+
+    function openModalTambah() {
+      document.getElementById('borangPengumuman').reset();
+      document.getElementById('formId').value = '';
+      document.getElementById('tajukModalBorang').textContent = 'Tambah Maklumat / Pengumuman';
+      document.getElementById('formMinggu').value = mingguDipilih;
+      
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('formTarikh').value = today;
+
+      document.getElementById('modalBorang').classList.remove('hidden');
+    }
+
+    function bukaModalEdit(id) {
+      const item = senaraiPengumuman.find(a => a.id === id);
+      if (!item) return;
+
+      document.getElementById('formId').value = item.id;
+      document.getElementById('tajukModalBorang').textContent = 'Kemaskini Pengumuman';
+      document.getElementById('formTajuk').value = item.tajuk;
+      document.getElementById('formGuru').value = item.guru;
+      document.getElementById('formTarikh').value = item.tarikh;
+      document.getElementById('formMinggu').value = item.minggu;
+      document.getElementById('formKategori').value = item.kategori;
+      document.getElementById('formKepentingan').value = item.kepentingan;
+      document.getElementById('formKandungan').value = item.kandungan;
+      document.getElementById('formTindakan').value = item.tindakan || '';
+      document.getElementById('formTarikhAkhir').value = item.tarikhAkhir || '';
+
+      document.getElementById('modalBorang').classList.remove('hidden');
+    }
+
+    function tutupModalBorang() {
+      document.getElementById('modalBorang').classList.add('hidden');
+    }
+
+    function simpanPengumuman(e) {
+      e.preventDefault();
+
+      const id = document.getElementById('formId').value;
+      const tajuk = document.getElementById('formTajuk').value.trim();
+      const guru = document.getElementById('formGuru').value.trim();
+      const tarikh = document.getElementById('formTarikh').value;
+      const minggu = parseInt(document.getElementById('formMinggu').value, 10);
+      const kategori = document.getElementById('formKategori').value;
+      const kepentingan = document.getElementById('formKepentingan').value;
+      const kandungan = document.getElementById('formKandungan').value.trim();
+      const tindakan = document.getElementById('formTindakan').value.trim();
+      const tarikhAkhir = document.getElementById('formTarikhAkhir').value;
+
+      if (!tajuk || !guru || !kandungan) {
+        tunjukToast("Sila lengkapkan semua ruangan wajib.", "error");
+        return;
+      }
+
+      if (id) {
+        // Kemaskini rekod sedia ada
+        const index = senaraiPengumuman.findIndex(a => a.id === id);
+        if (index !== -1) {
+          senaraiPengumuman[index] = {
+            ...senaraiPengumuman[index],
+            tajuk,
+            guru,
+            tarikh,
+            minggu,
+            kategori,
+            kepentingan,
+            kandungan,
+            tindakan,
+            tarikhAkhir
+          };
+          tunjukToast("Pengumuman berjaya dikemaskini!", "success");
+        }
+      } else {
+        // Rekod baharu
+        const itemBaharu = {
+          id: 'ann-' + Date.now(),
+          tajuk,
+          guru,
+          tarikh,
+          minggu,
+          kategori,
+          kepentingan,
+          kandungan,
+          tindakan,
+          tarikhAkhir,
+          sudahDibaca: false
+        };
+        senaraiPengumuman.unshift(itemBaharu);
+        tunjukToast("Pengumuman baharu berjaya ditambah!", "success");
+      }
+
+      simpanKeStorage();
+      tutupModalBorang();
+
+      // Jika minggu ditambah berbeza, laraskan minggu aktif kepada minggu pengumuman tersebut
+      if (mingguDipilih !== minggu) {
+        mingguDipilih = minggu;
+        document.getElementById('pilihMingguUtama').value = minggu;
+      }
+
+      kemaskiniPaparan();
+    }
+
+    function togolStatusBaca(id) {
+      const item = senaraiPengumuman.find(a => a.id === id);
+      if (item) {
+        item.sudahDibaca = !item.sudahDibaca;
+        simpanKeStorage();
+        kemaskiniPaparan();
+        tunjukToast(item.sudahDibaca ? "Ditandakan sebagai Telah Dibaca" : "Ditandakan sebagai Belum Dibaca");
+      }
+    }
+
+    function tandakanSemuaMingguIniDibaca() {
+      let dikemaskini = 0;
+      senaraiPengumuman.forEach(item => {
+        if (item.minggu === mingguDipilih && !item.sudahDibaca) {
+          item.sudahDibaca = true;
+          dikemaskini++;
+        }
+      });
+      if (dikemaskini > 0) {
+        simpanKeStorage();
+        kemaskiniPaparan();
+        tunjukToast(`Semua ${dikemaskini} maklumat Minggu ${mingguDipilih} telah ditandakan dibaca!`, "success");
+      } else {
+        tunjukToast(`Semua maklumat bagi Minggu ${mingguDipilih} sudah pun dibaca.`);
+      }
+    }
+
+    function bukaModalPadam(id) {
+      idSedangDipadam = id;
+      document.getElementById('modalPadam').classList.remove('hidden');
+      document.getElementById('btnSahkanPadam').onclick = function() {
+        laksanaPadam();
+      };
+    }
+
+    function tutupModalPadam() {
+      idSedangDipadam = null;
+      document.getElementById('modalPadam').classList.add('hidden');
+    }
+
+    function laksanaPadam() {
+      if (!idSedangDipadam) return;
+      senaraiPengumuman = senaraiPengumuman.filter(a => a.id !== idSedangDipadam);
+      simpanKeStorage();
+      tutupModalPadam();
+      kemaskiniPaparan();
+      tunjukToast("Pengumuman telah berjaya dipadamkan.", "success");
+    }
+
+    function bukaModalLihat(id) {
+      const item = senaraiPengumuman.find(a => a.id === id);
+      if (!item) return;
+
+      itemSedangDilihat = item;
+      const gaya = dapatkanWarnaKepentingan(item.kepentingan);
+
+      document.getElementById('modalLihatHeader').className = `p-6 text-white ${gaya.headerBg}`;
+      document.getElementById('lihatBadgeKategori').textContent = item.kategori;
+      
+      const badgeKep = document.getElementById('lihatBadgeKepentingan');
+      badgeKep.textContent = item.kepentingan;
+      badgeKep.className = `text-xs font-bold px-3 py-1 rounded-full bg-white/20`;
+
+      document.getElementById('lihatTajuk').textContent = item.tajuk;
+      document.getElementById('lihatSubinfo').innerHTML = `
+        <span><i class="fa-solid fa-user-pen mr-1"></i> Dihantar: ${item.guru}</span>
+        <span><i class="fa-regular fa-calendar mr-1"></i> Tarikh: ${formatTarikh(item.tarikh)}</span>
+        <span><i class="fa-solid fa-calendar-week mr-1"></i> Minggu ${item.minggu}</span>
+      `;
+
+      document.getElementById('lihatKandungan').textContent = item.kandungan;
+
+      const tindBox = document.getElementById('lihatTindakanBox');
+      if (item.tindakan && item.tindakan.trim() !== '') {
+        tindBox.classList.remove('hidden');
+        document.getElementById('lihatTindakanTeks').textContent = item.tindakan;
+        document.getElementById('lihatTarikhAkhirTeks').textContent = item.tarikhAkhir ? `Tarikh Akhir Penyelesaian: ${formatTarikh(item.tarikhAkhir)}` : 'Tiada tarikh khusus';
+      } else {
+        tindBox.classList.add('hidden');
+      }
+
+      document.getElementById('lihatStatusBacaan').innerHTML = `
+        Status: <strong class="${item.sudahDibaca ? 'text-emerald-600' : 'text-amber-600'}">${item.sudahDibaca ? 'Telah Disemak / Dibaca' : 'Belum Disemak'}</strong>
+      `;
+
+      document.getElementById('modalLihat').classList.remove('hidden');
+    }
+
+    function tutupModalLihat() {
+      document.getElementById('modalLihat').classList.add('hidden');
+      itemSedangDilihat = null;
+    }
+
+    function aplikasiPenapis() {
+      kemaskiniPaparan();
+    }
+
+    function resetTapisan() {
+      const c = document.getElementById('filterCarian');
+      const k = document.getElementById('filterKategori');
+      const p = document.getElementById('filterKepentingan');
+      if (c) c.value = '';
+      if (k) k.value = '';
+      if (p) p.value = '';
+      kemaskiniPaparan();
+      tunjukToast("Tapisan telah diset semula.");
+    }
+
+    function cetakLaporanMingguan() {
+      const jadual = JADUAL_GURU.find(j => j.minggu === mingguDipilih) || JADUAL_GURU[0];
+      const dataMinggu = senaraiPengumuman.filter(a => a.minggu === mingguDipilih);
+
+      document.getElementById('printTarikhJana').textContent = `Dijana pada: ${new Date().toLocaleString('ms-MY')}`;
+      document.getElementById('printMinggu').textContent = `LAPORAN PENGUMUMAN - MINGGU ${jadual.minggu}`;
+      document.getElementById('printKod').textContent = `KOD GURU: ${jadual.kod}`;
+
+      document.getElementById('printSenaraiGuru').innerHTML = jadual.guru.map(g => `&bull; ${g.nama} (${g.peranan})`).join('<br>');
+
+      const printIsi = document.getElementById('printIsiPengumuman');
+      if (dataMinggu.length === 0) {
+        printIsi.innerHTML = `<p class="italic text-gray-500">Tiada sebarang pengumuman direkodkan bagi minggu ini.</p>`;
+      } else {
+        printIsi.innerHTML = dataMinggu.map((item, idx) => `
+          <div class="border-b border-gray-200 pb-3">
+            <div class="flex justify-between font-bold text-sm">
+              <span>${idx + 1}. ${item.tajuk}</span>
+              <span class="uppercase text-xs font-semibold">[${item.kepentingan}] - ${item.kategori}</span>
+            </div>
+            <p class="text-xs text-gray-600 mt-0.5">Penghantar: ${item.guru} | Tarikh: ${formatTarikh(item.tarikh)}</p>
+            <p class="mt-1 text-xs leading-relaxed">${item.kandungan}</p>
+            ${item.tindakan ? `
+              <div class="mt-1 font-bold text-xs bg-gray-100 p-1.5 rounded">
+                Tindakan: ${item.tindakan} ${item.tarikhAkhir ? `(Sebelum: ${formatTarikh(item.tarikhAkhir)})` : ''}
+              </div>
+            ` : ''}
+          </div>
+        `).join('');
+      }
+
+      window.print();
+    }
+
+    function cetakItemTunggal() {
+      if (!itemSedangDilihat) return;
+      const jadual = JADUAL_GURU.find(j => j.minggu === itemSedangDilihat.minggu) || JADUAL_GURU[0];
+
+      document.getElementById('printTarikhJana').textContent = `Cetakan Item Tunggal: ${new Date().toLocaleString('ms-MY')}`;
+      document.getElementById('printMinggu').textContent = `PENGUMUMAN KHAS - MINGGU ${itemSedangDilihat.minggu}`;
+      document.getElementById('printKod').textContent = `KOD GURU: ${jadual.kod}`;
+      document.getElementById('printSenaraiGuru').innerHTML = jadual.guru.map(g => `&bull; ${g.nama}`).join('<br>');
+
+      document.getElementById('printIsiPengumuman').innerHTML = `
+        <div class="border border-black p-4 rounded-lg">
+          <h2 class="text-base font-black mb-1">${itemSedangDilihat.tajuk}</h2>
+          <p class="text-xs font-semibold text-gray-700 mb-3">Kategori: ${itemSedangDilihat.kategori} | Tahap: ${itemSedangDilihat.kepentingan} | Guru: ${itemSedangDilihat.guru}</p>
+          <p class="text-sm leading-relaxed mb-4">${itemSedangDilihat.kandungan}</p>
+          ${itemSedangDilihat.tindakan ? `
+            <div class="p-2 border border-gray-400 bg-gray-100 font-bold text-xs">
+              TINDAKAN DIPERLUKAN: ${itemSedangDilihat.tindakan}
+              ${itemSedangDilihat.tarikhAkhir ? `<br><span class="text-red-700">TARIKH AKHIR: ${formatTarikh(itemSedangDilihat.tarikhAkhir)}</span>` : ''}
+            </div>
+          ` : ''}
+        </div>
+      `;
+
+      window.print();
+    }
+
+    function formatTarikh(tarikhString) {
+      if (!tarikhString) return '-';
+      try {
+        const d = new Date(tarikhString);
+        return d.toLocaleDateString('ms-MY', { day: '2-digit', month: 'short', year: 'numeric' });
+      } catch (e) {
+        return tarikhString;
+      }
+    }
+
+    let toastTimer = null;
+    function tunjukToast(mesej, jenis = 'info') {
+      const toast = document.getElementById('toast');
+      const toastMesej = document.getElementById('toastMesej');
+      const toastIcon = document.getElementById('toastIcon');
+
+      toastMesej.textContent = mesej;
+
+      if (jenis === 'success') {
+        toastIcon.className = "fa-solid fa-circle-check text-emerald-400 text-lg";
+      } else if (jenis === 'error') {
+        toastIcon.className = "fa-solid fa-triangle-exclamation text-rose-400 text-lg";
+      } else {
+        toastIcon.className = "fa-solid fa-circle-info text-sky-400 text-lg";
+      }
+
+      toast.classList.remove('translate-y-24', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-24', 'opacity-0');
+      }, 3200);
+    }
+
+    function confirmModalCustom(mesej) {
+      // Pembantu mudah tanpa alert() / confirm() browser
+      return window.confirm ? window.confirm(mesej) : true;
+    }
+
+    // Inisialisasi semasa laman dimuatkan
+    window.onload = function() {
+      initAplikasi();
+    };
+  </script>
+</body>
+</html>
